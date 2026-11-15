@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Em Paz, Romanos 5:1-11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one-screen deck. Night (inimizade) -> dawn (paz). Text left, animated scene right. Single theme by choice. */
+:root{
+  color-scheme: dark;
+  --ink:#0d1524;
+  --ink-2:#17233a;
+  --bone:#f4eddf;
+  --muted:#a7b2c6;
+  --gold:#e9b750;
+  --blood:#c4424f;
+  --peace:#86cdbc;
+  --line:rgba(244,237,223,.16);
+  --display:"Fraunces", Georgia, "Times New Roman", serif;
+  --body:"Figtree", "Segoe UI", system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--ink);color:var(--bone);font-family:var(--body);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+.deck{position:relative;height:100%;display:flex;flex-direction:column;isolation:isolate}
+.bg{position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity 1.2s ease}
+.bg.night{background:radial-gradient(120% 90% at 15% 0%, #1c2b47 0%, var(--ink) 60%)}
+.bg.storm{background:radial-gradient(110% 90% at 80% 0%, #2a2233 0%, #0b0f18 65%)}
+.bg.dawn{background:radial-gradient(130% 100% at 85% 100%, #5a3a2a 0%, #2a2740 38%, var(--ink) 75%)}
+.deck[data-mood="night"] .bg.night,
+.deck[data-mood="storm"] .bg.storm,
+.deck[data-mood="dawn"] .bg.dawn{opacity:1}
+
+.stage{position:relative;flex:1;min-height:0;cursor:pointer}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:clamp(20px,4vw,64px);overflow-y:auto;
+  opacity:0;visibility:hidden;transform:translateX(48px);
+  transition:opacity .55s ease, transform .55s ease, visibility 0s .55s}
+.slide.past{transform:translateX(-48px)}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .55s ease, transform .55s ease}
+.inner{width:100%;max-width:1240px;display:grid;gap:clamp(20px,3.5vw,56px);align-items:center;margin:auto}
+.inner.split{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.col{display:flex;flex-direction:column;gap:clamp(12px,1.8vw,24px);min-width:0}
+
+.eyebrow{font-size:clamp(.78rem,1.05vw,1rem);letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:600}
+h1,h2{font-family:var(--display);font-weight:600;text-wrap:balance;line-height:1.05;letter-spacing:-.01em}
+h1{font-size:clamp(2.6rem,8.2vw,7rem)}
+h2{font-size:clamp(1.8rem,4.1vw,3.5rem)}
+h1 em,h2 em{font-style:italic;font-weight:400;color:var(--gold)}
+p,li{font-size:clamp(1.05rem,1.75vw,1.55rem);line-height:1.4;color:var(--bone)}
+.lead{color:var(--muted);max-width:34ch}
+.ref{font-size:clamp(.85rem,1.1vw,1.05rem);color:var(--muted);letter-spacing:.04em}
+.verse{font-family:var(--display);font-style:italic;font-size:clamp(1.3rem,2.6vw,2.3rem);line-height:1.25;text-wrap:balance}
+.verse b{font-weight:600;color:var(--gold);font-style:normal}
+
+ul.points{list-style:none;display:flex;flex-direction:column;gap:clamp(10px,1.4vw,18px)}
+ul.points li{padding-left:1.3em;position:relative}
+ul.points li::before{content:"";position:absolute;left:0;top:.55em;width:.7em;height:3px;border-radius:2px;background:var(--gold)}
+.cold ul.points li::before{background:var(--blood)}
+.warm ul.points li::before{background:var(--peace)}
+.cold h2 em{color:var(--blood)}
+.warm h2 em{color:var(--peace)}
+
+/* fragments */
+.f{opacity:0;transform:translateY(16px);transition:opacity .6s ease, transform .6s ease}
+.f.on{opacity:1;transform:none}
+
+/* cover */
+.cover{text-align:left}
+.cover .rule{height:3px;width:clamp(80px,14vw,200px);background:var(--gold);transform-origin:left;animation:grow 1.2s .3s both ease-out}
+.cover h1 span{display:inline-block;animation:rise .9s both cubic-bezier(.2,.7,.2,1)}
+.cover h1 span:nth-child(2){animation-delay:.15s}
+@keyframes rise{from{opacity:0;transform:translateY(.4em)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hint{color:var(--muted);font-size:clamp(.85rem,1.1vw,1rem)}
+kbd{font-family:var(--body);border:1px solid var(--line);border-radius:6px;padding:.1em .45em;font-size:.9em}
+
+/* chain slide */
+.chain{display:flex;flex-wrap:wrap;gap:clamp(10px,1.6vw,22px);align-items:stretch}
+.chain .step{flex:1 1 200px;border-top:3px solid var(--gold);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+.chain .step strong{font-family:var(--display);font-size:clamp(1.3rem,2.4vw,2.1rem);font-weight:600}
+.chain .step span{color:var(--muted);font-size:clamp(.95rem,1.4vw,1.25rem);line-height:1.35}
+.chain .step:nth-child(3){border-color:var(--blood)}
+.chain .step:nth-child(4){border-color:var(--peace)}
+
+/* scenes */
+svg.scene{width:100%;height:auto;display:block;overflow:visible}
+.scene text{font-family:var(--body);fill:var(--bone)}
+.scene .lbl{font-size:20px;font-weight:700;letter-spacing:.16em}
+.scene .sm{font-size:15px;fill:var(--muted);letter-spacing:.06em}
+.cliff{fill:var(--ink-2);stroke:var(--line);stroke-width:1.5}
+.s{transform-box:fill-box}
+
+/* scene: duas pessoas */
+.pA,.pB{transition:transform 1.4s cubic-bezier(.3,.8,.3,1)}
+.crack{stroke:var(--blood);stroke-width:3;fill:none;transition:opacity .6s}
+.link{stroke:var(--gold);stroke-width:4;fill:none;opacity:0;transition:opacity .8s .9s}
+.paz{opacity:0;transition:opacity .8s 1.1s}
+.pA.on{transform:translateX(88px)} .pB.on{transform:translateX(-88px)}
+.crack.on{opacity:0} .link.on,.paz.on{opacity:1}
+
+/* scene: tentativas */
+.try{fill:var(--muted);transform-origin:right center;transform:scaleX(0);opacity:0}
+.try.on{animation:tryfail 2.4s forwards ease-in-out}
+@keyframes tryfail{
+  0%{transform:scaleX(0);opacity:1}
+  45%{transform:scaleX(1);opacity:1}
+  62%{transform:scaleX(1) rotate(0deg);opacity:1}
+  100%{transform:scaleX(1) rotate(-58deg);opacity:.3}
+}
+.trylbl{opacity:0;transition:opacity .5s .3s}
+.trylbl.on{opacity:1}
+.sinword{fill:var(--blood)!important;font-family:var(--display)!important;font-style:italic;font-size:30px}
+
+/* scene: ponte */
+.beam{fill:var(--gold);transform-origin:left center;transform:scaleX(0);transition:transform 1.6s cubic-bezier(.3,.8,.3,1)}
+.beam.on{transform:scaleX(1)}
+.post{fill:var(--gold);opacity:0;transform:translateY(-70px);transition:opacity .7s 1s, transform 1s 1s cubic-bezier(.3,.8,.3,1)}
+.post.on{opacity:1;transform:none}
+.love{fill:var(--blood);opacity:0}
+.love.on{animation:loveGo 2.6s ease-in-out infinite}
+@keyframes loveGo{0%{opacity:0;transform:translateX(0)}15%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translateX(470px)}}
+.walker{transition:transform 3.2s 0.2s ease-in-out}
+.walker.on{transform:translateX(-440px)}
+.walker circle,.walker rect{fill:var(--bone)}
+.glow{fill:var(--gold);opacity:0;transition:opacity 1.5s 2.6s}
+.glow.on{opacity:.16}
+
+/* scene: ira */
+.rain line{stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-dasharray:14 26;animation:rain 1s linear infinite;opacity:.7}
+@keyframes rain{to{stroke-dashoffset:-40}}
+.cloud{fill:#2b2f3d}
+.dome{fill:var(--ink);stroke:var(--gold);stroke-width:3;opacity:0;transform-origin:center bottom;transform:scale(.6);transition:opacity .8s, transform 1s cubic-bezier(.3,.8,.3,1)}
+.dome.on{opacity:1;transform:none}
+.xbar{fill:var(--gold);opacity:0;transition:opacity .8s .5s}
+.xbar.on{opacity:1}
+.more{font-family:var(--display)!important;font-style:italic;font-size:26px;fill:var(--gold)!important;opacity:0;transition:opacity .8s}
+.more.on{opacity:1}
+
+/* aplicações */
+.apply h2{font-size:clamp(1.5rem,3.2vw,2.7rem);max-width:26ch}
+.qs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(12px,1.8vw,24px)}
+.q{border-left:3px solid var(--gold);padding:4px 0 4px clamp(12px,1.4vw,20px)}
+.q p{font-size:clamp(1rem,1.5vw,1.35rem)}
+.q.truth{border-color:var(--peace)}
+.q.truth p{font-family:var(--display);font-style:italic;font-size:clamp(1.1rem,1.75vw,1.55rem)}
+.q small{display:block;font-size:clamp(.72rem,.9vw,.85rem);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:600}
+
+/* closing */
+.sun{position:absolute;left:50%;bottom:-38vmin;width:76vmin;height:76vmin;border-radius:50%;translate:-50% 0;
+  background:radial-gradient(circle, rgba(233,183,80,.55) 0%, rgba(233,183,80,.12) 45%, transparent 70%);
+  animation:sunrise 3s ease-out both;pointer-events:none}
+.slide:not(.active) .sun{animation:none}
+@keyframes sunrise{from{transform:translateY(30vmin);opacity:0}to{transform:none;opacity:1}}
+.center{text-align:center;justify-items:center}
+.center .col{align-items:center}
+
+/* bar */
+.bar{display:flex;align-items:center;gap:12px;padding:10px clamp(16px,3vw,32px);border-top:1px solid var(--line)}
+.track{flex:1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--gold);transition:width .5s ease}
+.count{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem;min-width:4.2em;text-align:center}
+.bar button{font:600 .9rem var(--body);color:var(--bone);background:transparent;border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer}
+.bar button:hover{border-color:var(--gold);color:var(--gold)}
+.bar button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.bar button:disabled{opacity:.35;cursor:default}
+
+@media (max-width:820px){
+  .inner.split{grid-template-columns:1fr}
+  .slide{align-items:flex-start}
+  .lead{max-width:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+}
+
+/* ===== Palestra 9 ===== */
+.big{font-family:var(--display);font-weight:600;font-size:clamp(4rem,15vw,12rem);line-height:.95;font-variant-numeric:tabular-nums;color:var(--gold)}
+.big small{font-size:.28em;font-weight:400;font-style:italic;color:var(--bone);margin-left:.3em}
+.years{display:flex;align-items:baseline;gap:clamp(12px,2vw,28px);flex-wrap:wrap}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:clamp(12px,1.8vw,24px)}
+.card{background:rgba(23,35,58,.7);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:10px;padding:clamp(14px,1.8vw,24px);display:flex;flex-direction:column;gap:8px}
+.card strong{font-family:var(--display);font-size:clamp(1.5rem,2.8vw,2.4rem);font-weight:600}
+.card span{color:var(--muted);font-size:clamp(.95rem,1.35vw,1.2rem);line-height:1.35}
+.card .v{color:var(--gold);font-size:.85rem;letter-spacing:.12em;font-weight:600}
+.card.was strong{color:var(--blood);font-style:italic;font-weight:400}
+.card.was{border-top-color:var(--blood)}
+.card .ans{color:var(--gold);font-weight:600;font-size:clamp(1rem,1.5vw,1.3rem)}
+.note{color:var(--muted);font-size:clamp(.95rem,1.3vw,1.2rem)}
+.quote{font-family:var(--display);font-style:italic;font-size:clamp(1.6rem,3.6vw,3.2rem);line-height:1.2;text-wrap:balance;max-width:22ch}
+.quote b{color:var(--gold);font-weight:600}
+.principle{font-family:var(--display);font-size:clamp(1.9rem,4.6vw,4rem);line-height:1.1;font-weight:600;text-wrap:balance;max-width:20ch}
+.principle em{font-style:italic;font-weight:400;color:var(--gold)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(16px,3vw,48px)}
+.two h3{font-family:var(--display);font-size:clamp(1.3rem,2.4vw,2rem);font-weight:600;margin-bottom:12px}
+.cold h3{color:var(--blood)} .warm h3{color:var(--peace)}
+.two li{font-size:clamp(.98rem,1.4vw,1.25rem)}
+.apply .q p{font-size:clamp(1.05rem,1.65vw,1.5rem)}
+.apply .q b{color:var(--gold);font-weight:600}
+.divtitle h2{font-size:clamp(2.4rem,6.5vw,5.6rem)}
+.divnum{font-family:var(--display);font-style:italic;color:var(--gold);font-size:clamp(1.2rem,2vw,1.8rem)}
+
+/* diagrama 5:3-5 */
+svg.dg{max-height:50vh}
+@media (max-width:820px){svg.dg{max-height:none}}
+.dg text{font-family:var(--body);fill:var(--bone)}
+.dg .nm{font-size:25px;font-weight:700}
+.dg .sb{font-size:16px;fill:var(--muted)}
+.dg .pz{font-size:15px;fill:var(--gold);font-style:italic;font-family:var(--display);opacity:0;transition:opacity .6s .9s}
+.dg .pz.on{opacity:1}
+.node{transform-box:fill-box;transform-origin:center;opacity:0;transform:scale(.3);transition:opacity .5s .6s, transform .8s .6s cubic-bezier(.3,1.5,.5,1)}
+.node.first{transition-delay:0s}
+.node.on{opacity:1;transform:none}
+.ring{fill:var(--ink-2);stroke-width:3.5}
+.conn{fill:none;stroke:var(--gold);stroke-width:3.5;stroke-linecap:round;stroke-dasharray:320;stroke-dashoffset:320;transition:stroke-dashoffset 1s ease-out}
+.conn.on{stroke-dashoffset:0}
+.press{stroke:var(--blood);stroke-width:5;stroke-linecap:round;fill:none;animation:press 1.1s ease-in infinite}
+@keyframes press{0%{transform:translateY(-9px);opacity:.2}60%{opacity:1}100%{transform:translateY(7px);opacity:1}}
+.node.on .shake{animation:shake .5s linear infinite}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-1.6px)}75%{transform:translateX(1.6px)}}
+.beat{fill:var(--peace);transform-box:fill-box;transform-origin:center;animation:beat 1.6s ease-in-out infinite}
+.beat2{fill:none;stroke:var(--peace);stroke-width:2.5;transform-box:fill-box;transform-origin:center;animation:beat2 1.6s ease-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+@keyframes beat2{0%{transform:scale(.5);opacity:1}100%{transform:scale(1.5);opacity:0}}
+.chk{fill:none;stroke:var(--gold);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:70;stroke-dashoffset:70}
+.node.on .chk{animation:draw .7s 1.5s forwards ease-out}
+@keyframes draw{to{stroke-dashoffset:0}}
+.sunc{fill:var(--gold)}
+.rays{stroke:var(--gold);stroke-width:3.5;stroke-linecap:round;transform-box:fill-box;transform-origin:center;animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.halo{fill:var(--gold);opacity:0;transition:opacity 1.4s 1.2s}
+.halo.on{opacity:.14}
+.drop{fill:var(--gold);opacity:0}
+.drop.on{animation:dropf 2.4s linear infinite}
+@keyframes dropf{0%{opacity:0;transform:translateY(0)}12%{opacity:.95}80%{opacity:.8}100%{opacity:0;transform:translateY(var(--d))}}
+.pour{opacity:0;transition:opacity .9s}
+.pour.on{opacity:1}
+.pour text{font-family:var(--display);font-style:italic;fill:var(--gold)}
+.cap{min-height:3.2em;position:relative}
+.cap p{position:absolute;inset:0;color:var(--muted);font-size:clamp(1rem,1.6vw,1.4rem)}
+.cap p b{color:var(--bone);font-weight:600}
+.cap p.f.on.gone{opacity:0}
+
+/* ===== efeitos v2 ===== */
+#fx{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.slide{filter:blur(10px);transform:translateX(60px) scale(.96);transition:opacity .6s ease, transform .7s cubic-bezier(.2,.8,.2,1), filter .6s ease, visibility 0s .7s}
+.slide.past{transform:translateX(-60px) scale(.96)}
+.slide.active{filter:none;transform:none;transition:opacity .6s ease, transform .7s cubic-bezier(.2,.8,.2,1), filter .6s ease}
+.slide.active .eyebrow,.slide.active .divnum{animation:eye .9s both}
+@keyframes eye{from{opacity:0;letter-spacing:.5em}to{opacity:1}}
+.slide.active h2{animation:hin .9s .1s both cubic-bezier(.2,.8,.2,1)}
+@keyframes hin{from{opacity:0;transform:translateY(28px) scale(.97);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+h2 em{background:linear-gradient(currentColor,currentColor) no-repeat 0 96%/0 3px;transition:background-size 1s .8s ease}
+.slide.active h2 em{background-size:100% 3px}
+ul.points li.f{transform:translateX(-36px)}
+ul.points li.f.on{transform:none}
+.card.f{transform:perspective(900px) rotateX(-75deg) translateY(24px);transform-origin:top center;transition:opacity .5s ease, transform .8s cubic-bezier(.3,1.4,.5,1)}
+.card.f.on{transform:none;box-shadow:0 18px 40px -22px rgba(233,183,80,.55)}
+.card .ans.f{transform:scale(.6);transition:opacity .4s, transform .6s cubic-bezier(.3,1.8,.5,1)}
+.card .ans.f.on{transform:none}
+.q.f{transform:translateY(30px) scale(.94)}
+.q.f.on{transform:none}
+.step.f{transform:translateY(26px) rotate(-1.5deg)}
+.step.f.on{transform:none}
+.principle{background:linear-gradient(100deg,var(--bone) 42%,var(--gold) 50%,var(--bone) 58%) 120% 0/260% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shim 4.5s linear infinite}
+.principle em{-webkit-text-fill-color:var(--gold)}
+@keyframes shim{to{background-position:-140% 0}}
+.slide.active .principle{animation:shim 4.5s linear infinite, hin 1s both}
+.quote{animation:none}
+.slide.active .quote b{display:inline-block;animation:sway 2.4s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(2deg) translateY(-4px)}}
+.fill{box-shadow:0 0 12px var(--gold)}
+.spk{opacity:0;transition:opacity .5s 1s}
+.spk.on{opacity:1}
+.spk circle{fill:#fff3cf;filter:drop-shadow(0 0 6px var(--gold))}
+.node.on .ring{animation:ringglow 2.6s ease-in-out infinite}
+@keyframes ringglow{0%,100%{filter:drop-shadow(0 0 0 rgba(233,183,80,0))}50%{filter:drop-shadow(0 0 10px rgba(233,183,80,.7))}}
+/* prensas */
+svg.pr{max-height:52vh}
+.pr .nm2{font-size:24px;font-weight:700;fill:var(--bone)}
+.st{opacity:0;transform:translateY(24px);transition:opacity .6s, transform .7s cubic-bezier(.3,1.4,.5,1)}
+.st.on{opacity:1;transform:none}
+.plate{fill:var(--bone)}
+.st.on .plate{animation:plate 1.5s cubic-bezier(.6,0,.9,.4) infinite alternate}
+@keyframes plate{0%,15%{transform:translateY(0)}100%{transform:translateY(60px)}}
+.squish{display:inline-block;transform-origin:bottom left;font-family:var(--display)}
+.squish.on{animation:squish 1.8s ease-in-out infinite}
+@keyframes squish{0%,100%{transform:scaleY(1);letter-spacing:0}50%{transform:scaleY(.72) scaleX(1.04);letter-spacing:.02em;color:var(--blood)}}
+@media (max-width:820px){svg.pr{max-height:none}}
+</style>
+</head>
+<body>
+<div class="deck" id="deck" data-mood="night">
+  <div class="bg night"></div><div class="bg storm"></div><div class="bg dawn"></div><canvas id="fx" aria-hidden="true"></canvas>
+
+  <main class="stage" id="stage" aria-live="polite">
+    <!-- capa -->
+    <section class="slide cover" data-mood="night">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Palestra 9 · Romanos 5:1-11</p>
+          <h1><span>Em </span><span><em>paz</em></span></h1>
+          <div class="rule"></div>
+          <p class="lead">Reconciliados com Deus, até a prensa passa a ter propósito.</p>
+          <p class="hint">Avance com <kbd>→</kbd>, <kbd>espaço</kbd> ou um clique. Volte com <kbd>←</kbd>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- prensa -->
+    <section class="slide" data-mood="storm">
+      <div class="inner" style="gap:clamp(8px,1.4vw,18px)">
+        <div class="col" style="gap:8px">
+          <p class="eyebrow">Na cozinha de casa</p>
+          <h2>O melhor só sai <em>debaixo de pressão</em>.</h2>
+        </div>
+        <svg class="scene pr" viewBox="0 0 900 410" role="img" aria-label="Três prensas: o trigo vira farinha, a azeitona vira azeite, o café vira bebida">
+          <g class="st" data-f="1">
+            <text class="lbl" x="150" y="38" text-anchor="middle">TRIGO</text>
+            <line x1="150" y1="52" x2="150" y2="150" stroke="#a7b2c6" stroke-width="6"/>
+            <circle cx="110" cy="188" r="6" fill="#e9b750"/><circle cx="126" cy="181" r="6" fill="#e9b750"/><circle cx="142" cy="188" r="6" fill="#e9b750"/><circle cx="158" cy="181" r="6" fill="#e9b750"/><circle cx="174" cy="188" r="6" fill="#e9b750"/><circle cx="190" cy="181" r="6" fill="#e9b750"/>
+            <rect class="plate s" x="80" y="96" width="140" height="22" rx="4"/>
+            <rect x="68" y="198" width="164" height="12" rx="3" fill="#a7b2c6"/>
+            <path d="M98 300 Q150 356 202 300 Z" fill="#f4eddf" opacity=".9"/>
+            <path d="M92 300 H208" stroke="#f4eddf" stroke-width="3"/>
+            <text class="nm2" x="150" y="378" text-anchor="middle">Farinha</text>
+            <text class="sm" x="150" y="400" text-anchor="middle">sem moer, não há pão</text>
+          </g><circle class="drop s" data-f="1" cx="126" cy="222" r="5" style="--d:78px;animation-delay:0.00s;fill:#f4eddf"/><circle class="drop s" data-f="1" cx="142" cy="222" r="4" style="--d:78px;animation-delay:0.45s;fill:#f4eddf"/><circle class="drop s" data-f="1" cx="158" cy="222" r="5" style="--d:78px;animation-delay:0.90s;fill:#f4eddf"/><circle class="drop s" data-f="1" cx="174" cy="222" r="4" style="--d:78px;animation-delay:1.35s;fill:#f4eddf"/>
+          <g class="st" data-f="2">
+            <text class="lbl" x="450" y="38" text-anchor="middle">AZEITONA</text>
+            <line x1="450" y1="52" x2="450" y2="150" stroke="#a7b2c6" stroke-width="6"/>
+            <circle cx="410" cy="188" r="6" fill="#9bb35a"/><circle cx="426" cy="181" r="6" fill="#9bb35a"/><circle cx="442" cy="188" r="6" fill="#9bb35a"/><circle cx="458" cy="181" r="6" fill="#9bb35a"/><circle cx="474" cy="188" r="6" fill="#9bb35a"/><circle cx="490" cy="181" r="6" fill="#9bb35a"/>
+            <rect class="plate s" x="380" y="96" width="140" height="22" rx="4"/>
+            <rect x="368" y="198" width="164" height="12" rx="3" fill="#a7b2c6"/>
+            <path d="M398 300 Q450 356 502 300 Z" fill="#e9b750" opacity=".9"/>
+            <path d="M392 300 H508" stroke="#f4eddf" stroke-width="3"/>
+            <text class="nm2" x="450" y="378" text-anchor="middle">Azeite</text>
+            <text class="sm" x="450" y="400" text-anchor="middle">sem prensar, não há azeite</text>
+          </g><circle class="drop s" data-f="2" cx="426" cy="222" r="5" style="--d:78px;animation-delay:0.00s;fill:#e9b750"/><circle class="drop s" data-f="2" cx="442" cy="222" r="4" style="--d:78px;animation-delay:0.45s;fill:#e9b750"/><circle class="drop s" data-f="2" cx="458" cy="222" r="5" style="--d:78px;animation-delay:0.90s;fill:#e9b750"/><circle class="drop s" data-f="2" cx="474" cy="222" r="4" style="--d:78px;animation-delay:1.35s;fill:#e9b750"/>
+          <g class="st" data-f="3">
+            <text class="lbl" x="750" y="38" text-anchor="middle">CAFÉ</text>
+            <line x1="750" y1="52" x2="750" y2="150" stroke="#a7b2c6" stroke-width="6"/>
+            <circle cx="710" cy="188" r="6" fill="#b07a4a"/><circle cx="726" cy="181" r="6" fill="#b07a4a"/><circle cx="742" cy="188" r="6" fill="#b07a4a"/><circle cx="758" cy="181" r="6" fill="#b07a4a"/><circle cx="774" cy="188" r="6" fill="#b07a4a"/><circle cx="790" cy="181" r="6" fill="#b07a4a"/>
+            <rect class="plate s" x="680" y="96" width="140" height="22" rx="4"/>
+            <rect x="668" y="198" width="164" height="12" rx="3" fill="#a7b2c6"/>
+            <path d="M698 300 Q750 356 802 300 Z" fill="#7a4a2c" opacity=".9"/>
+            <path d="M692 300 H808" stroke="#f4eddf" stroke-width="3"/>
+            <text class="nm2" x="750" y="378" text-anchor="middle">Café</text>
+            <text class="sm" x="750" y="400" text-anchor="middle">sem moer, não há aroma</text>
+          </g><circle class="drop s" data-f="3" cx="726" cy="222" r="5" style="--d:78px;animation-delay:0.00s;fill:#7a4a2c"/><circle class="drop s" data-f="3" cx="742" cy="222" r="4" style="--d:78px;animation-delay:0.45s;fill:#7a4a2c"/><circle class="drop s" data-f="3" cx="758" cy="222" r="5" style="--d:78px;animation-delay:0.90s;fill:#7a4a2c"/><circle class="drop s" data-f="3" cx="774" cy="222" r="4" style="--d:78px;animation-delay:1.35s;fill:#7a4a2c"/>
+        </svg>
+        <p class="note f" data-f="4" style="font-size:clamp(1.1rem,1.9vw,1.7rem);color:var(--bone)">Ninguém prensa o que quer jogar fora. Prensa-se o que tem valor, para tirar dele o que é puro.</p>
+      </div>
+    </section>
+
+    <!-- tribulum -->
+    <section class="slide" data-mood="storm">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Romanos 5:3 · a palavra de Paulo</p>
+          <p class="big squish" data-f="1" style="font-size:clamp(2.6rem,9.5vw,8rem);color:var(--bone)">Tribulação</p>
+          <ul class="points">
+            <li class="f" data-f="1">No grego de Paulo, <i>thlipsis</i>: pressão, aperto.</li>
+            <li class="f" data-f="2">No latim, <i>tribulum</i>: a tábua que debulhava o trigo e separava o grão da palha.</li>
+            <li class="f" data-f="3">A prensa não destrói o trigo. Ela revela o que há de valor nele.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- gancho -->
+    <section class="slide" data-mood="night">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Romanos 5:1</p>
+          <h2>Antes de falar da prensa, Paulo fala da <em>paz</em>.</h2>
+          <p class="verse f" data-f="1" style="max-width:30ch">“Tendo sido, pois, justificados pela fé, <b>temos paz com Deus</b>, por nosso Senhor Jesus Cristo.”</p>
+          <p class="note f" data-f="2">Essa paz não nasce em nós. Deus gera a fé, justifica, e o Espírito Santo vem morar em nós (5:1, 5).</p>
+          <div class="chain">
+            <div class="step f" data-f="3"><strong>O que a prensa produz?</strong><span>Romanos 5:1-5</span></div>
+            <div class="step f" data-f="4"><strong>Quem segura a prensa?</strong><span>Romanos 5:6-11</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 divisão 1 -->
+    <section class="slide divtitle" data-mood="night">
+      <div class="inner">
+        <div class="col">
+          <p class="divnum">Primeira divisão · Romanos 5:1-5</p>
+          <h2>Em paz, na <em>prensa</em></h2>
+          <p class="lead f" data-f="1">“Portanto”: tudo o que vem agora se apoia no que Deus já fez (1:18 a 4:25).</p>
+          <p class="note f" data-f="2">Paulo muda o tom: sai o “vocês”, entra o “nós”. Fica pessoal.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 três posses -->
+    <section class="slide" data-mood="night">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Romanos 5:1-2</p>
+          <h2>Três posses de quem foi <em>justificado</em></h2>
+          <div class="cards">
+            <div class="card f" data-f="1"><span class="v">V. 1</span><strong>Paz</strong><span>Não é sensação de tranquilidade. É uma situação: a ira de Deus foi aplacada.</span></div>
+            <div class="card f" data-f="2"><span class="v">V. 2</span><strong>Acesso</strong><span>Antes excluídos, agora firmes na presença da graça.</span></div>
+            <div class="card f" data-f="3"><span class="v">V. 2</span><strong>Esperança</strong><span>A glória de Deus: a beleza dEle, que veremos face a face.</span></div>
+          </div>
+          <p class="note f" data-f="4">As três estão em Cristo. Nenhuma depende das circunstâncias.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 Bruce -->
+    <section class="slide" data-mood="night">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Paz e alegria, bênçãos gêmeas</p>
+          <p class="quote">“A paz é a alegria <b>descansando</b>;</p>
+          <p class="quote f" data-f="1">a alegria é a paz <b>dançando</b>.”</p>
+          <p class="ref">Um antigo pregador, citado por F. F. Bruce</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 não só isso -->
+    <section class="slide" data-mood="storm">
+      <div class="inner">
+        <div class="col cold">
+          <p class="eyebrow">Romanos 5:3</p>
+          <h2>“Não só isso”: nos gloriamos também nas <em>tribulações</em>.</h2>
+          <ul class="points">
+            <li class="f" data-f="1">A vida no Espírito traz paz, alegria e também tribulação.</li>
+            <li class="f" data-f="2">Tribulação não é sinal de que a salvação está insegura.</li>
+            <li class="f" data-f="3">Nos alegramos pelo que ela produz, não pela dor.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 DIAGRAMA -->
+    <section class="slide" data-mood="dawn">
+      <div class="inner" style="gap:clamp(8px,1.2vw,16px)">
+        <div class="col" style="gap:8px">
+          <p class="eyebrow">Romanos 5:3-5 · “porque sabemos”</p>
+          <h2 style="font-size:clamp(1.5rem,3vw,2.6rem)">O que a tribulação <em>produz</em></h2>
+        </div>
+        <svg class="scene dg" viewBox="0 0 1000 440" role="img" aria-label="Tribulação produz perseverança, que produz caráter aprovado, que produz esperança; e o amor de Deus é derramado">
+          <circle class="halo" data-f="4" cx="880" cy="100" r="150"/>
+          <path class="conn" data-f="2" d="M176 318 C250 300 270 270 334 258"/>
+          <g class="spk" data-f="2"><circle r="5"><animateMotion dur="1.7s" repeatCount="indefinite" path="M176 318 C250 300 270 270 334 258"/></circle></g>
+          <g class="spk" data-f="3"><circle r="5"><animateMotion dur="1.7s" begin="0.5s" repeatCount="indefinite" path="M426 233 C500 215 520 185 584 173"/></circle></g>
+          <g class="spk" data-f="4"><circle r="5"><animateMotion dur="1.7s" begin="1s" repeatCount="indefinite" path="M676 148 C750 130 770 100 834 88"/></circle></g>
+          <path class="conn" data-f="3" d="M426 233 C500 215 520 185 584 173"/>
+          <path class="conn" data-f="4" d="M676 148 C750 130 770 100 834 88"/>
+          <text class="pz" data-f="2" x="240" y="268" text-anchor="middle">produz</text>
+          <text class="pz" data-f="3" x="490" y="183" text-anchor="middle">produz</text>
+          <text class="pz" data-f="4" x="740" y="98" text-anchor="middle">produz</text>
+
+          <g transform="translate(130 330)"><g class="node first" data-f="1">
+            <g class="shake s"><circle class="ring" r="48" stroke="#c4424f"/>
+            <path class="press s" d="M-16 -14 v22 M0 -20 v28 M16 -14 v22"/></g>
+            <text class="nm" y="82" text-anchor="middle">Tribulação</text><text class="sb" y="104" text-anchor="middle">pressão</text>
+          </g></g>
+          <g transform="translate(380 245)"><g class="node" data-f="2">
+            <circle class="ring" r="48" stroke="#86cdbc"/><circle class="beat2" r="26"/><circle class="beat" r="13"/>
+            <text class="nm" y="82" text-anchor="middle">Perseverança</text><text class="sb" y="104" text-anchor="middle">firmeza sob pressão</text>
+          </g></g>
+          <g transform="translate(630 160)"><g class="node" data-f="3">
+            <circle class="ring" r="48" stroke="#e9b750"/><path class="chk" d="M-20 2 L-6 16 L22 -16"/>
+            <text class="nm" y="82" text-anchor="middle">Caráter aprovado</text><text class="sb" y="104" text-anchor="middle">testado, como metal no fogo</text>
+          </g></g>
+          <g transform="translate(880 75)"><g class="node" data-f="4">
+            <circle class="ring" r="48" stroke="#e9b750"/>
+            <g class="rays"><path d="M0 -36 v-8 M0 36 v8 M-36 0 h-8 M36 0 h8 M-25.5 -25.5 l-5.6 -5.6 M25.5 25.5 l5.6 5.6 M-25.5 25.5 l-5.6 5.6 M25.5 -25.5 l5.6 -5.6"/></g>
+            <circle class="sunc" r="17"/>
+            <text class="nm" y="82" text-anchor="middle">Esperança</text><text class="sb" y="104" text-anchor="middle">certeza do futuro</text>
+          </g></g>
+
+          <g class="pour" data-f="5">
+            <text x="30" y="46" font-size="30">A esperança não decepciona.</text>
+            <text x="30" y="78" font-size="19" style="fill:#f4eddf;font-style:normal;font-family:Figtree,sans-serif">Deus derramou seu amor em nossos corações (5:5)</text>
+          </g>
+          <circle class="drop s" data-f="5" cx="130" cy="110" r="5" style="--d:170px"/>
+          <circle class="drop s" data-f="5" cx="210" cy="100" r="4" style="--d:200px;animation-delay:.7s"/>
+          <circle class="drop s" data-f="5" cx="380" cy="100" r="5" style="--d:95px;animation-delay:.4s"/>
+          <circle class="drop s" data-f="5" cx="470" cy="96" r="4" style="--d:120px;animation-delay:1.3s"/>
+          <circle class="drop s" data-f="5" cx="630" cy="20" r="5" style="--d:90px;animation-delay:.9s"/>
+          <circle class="drop s" data-f="5" cx="730" cy="10" r="4" style="--d:90px;animation-delay:1.7s"/>
+          <circle class="drop s" data-f="5" cx="300" cy="104" r="4" style="--d:150px;animation-delay:1.9s"/>
+          <circle class="drop s" data-f="5" cx="560" cy="30" r="4" style="--d:130px;animation-delay:.2s"/>
+        </svg>
+        <div class="cap">
+          <p class="f" data-only="1"><b>Tribulação:</b> a pressão que todos nós tentamos evitar.</p>
+          <p class="f" data-only="2"><b>Perseverança:</b> a pressão não quebra quem está firme na graça. Ela firma.</p>
+          <p class="f" data-only="3"><b>Caráter aprovado:</b> o puro que sai da prensa. Deus forma em nós qualidades dEle.</p>
+          <p class="f" data-only="4"><b>Esperança:</b> Paulo começa na esperança (v. 2) e termina na esperança (v. 4). A tribulação fica no meio.</p>
+          <p class="f" data-only="5"><b>A garantia:</b> o Espírito Santo em nós. “Derramou” fala de fartura, sem economia.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 princípio 1 -->
+    <section class="slide" data-mood="dawn">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Princípio</p>
+          <p class="principle">A prensa não cancela a paz. Deus a usa para produzir <em>esperança</em>.</p>
+          <p class="note f" data-f="1">O presente não determina o futuro de quem foi justificado.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 aplicações 1 -->
+    <section class="slide apply" data-mood="dawn">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Aplicações · para o coração</p>
+          <h2>Em paz, mesmo na <em>prensa</em></h2>
+          <div class="qs">
+            <div class="q f" data-f="1"><small>1</small><p>Você se aproxima de Deus como quem está <b>em paz</b> ou como quem ainda se esconde, com medo, tentando compensar? Que conversa com Ele você tem evitado?</p></div>
+            <div class="q f" data-f="2"><small>2</small><p>Que tribulação tem nome na sua vida hoje? E se, em vez de “por que comigo?”, você perguntasse: <b>“Senhor, o que estás produzindo em mim?”</b></p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 divisão 2 -->
+    <section class="slide divtitle" data-mood="night">
+      <div class="inner">
+        <div class="col">
+          <p class="divnum">Segunda divisão · Romanos 5:6-11</p>
+          <h2>Quem segura a <em>prensa</em></h2>
+          <p class="verse f" data-f="1" style="max-width:32ch">“Mas Deus demonstra seu amor por nós: Cristo morreu em nosso favor <b>quando ainda éramos pecadores</b>.” <span class="ref" style="font-style:normal">Rm 5:8</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 quatro retratos -->
+    <section class="slide" data-mood="storm">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Romanos 5:6-10 · “quando ainda éramos”</p>
+          <h2>Quatro retratos de quem Deus <em>amou</em></h2>
+          <div class="cards">
+            <div class="card was"><span class="v">V. 6</span><strong>fracos</strong><span class="ans f" data-f="1">Por ele, Cristo morreu.</span></div>
+            <div class="card was"><span class="v">V. 6</span><strong>ímpios</strong><span class="ans f" data-f="2">A ele, Deus justificou.</span></div>
+            <div class="card was"><span class="v">V. 8</span><strong>pecadores</strong><span class="ans f" data-f="3">A ele, Deus salvou.</span></div>
+            <div class="card was"><span class="v">V. 10</span><strong>inimigos</strong><span class="ans f" data-f="4">A ele, Deus reconciliou.</span></div>
+          </div>
+          <p class="note f" data-f="5">Dificilmente alguém morre por um justo (v. 7). Cristo morreu por inimigos.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 doutrina: definição -->
+    <section class="slide" data-mood="night">
+      <div class="inner split">
+        <div class="col">
+          <p class="eyebrow">Doutrina · Reconciliação</p>
+          <h2>Reconciliar é <em>fazer as pazes</em>.</h2>
+          <p class="lead f" data-f="1">Uma mudança de relacionamento: duas partes em hostilidade voltam a estar em paz.</p>
+        </div>
+        <svg class="scene" viewBox="0 0 600 280" role="img" aria-label="Duas pessoas afastadas que se aproximam e ficam em paz">
+          <path class="crack" data-f="1" d="M300 30 L285 80 L312 120 L288 170 L310 215 L298 255"/>
+          <path class="link" data-f="1" d="M262 140 H338"/>
+          <g class="pA s" data-f="1"><circle cx="150" cy="140" r="62" fill="none" stroke="#f4eddf" stroke-width="3"/><text x="150" y="147" text-anchor="middle" class="lbl">UM</text></g>
+          <g class="pB s" data-f="1"><circle cx="450" cy="140" r="62" fill="none" stroke="#f4eddf" stroke-width="3"/><text x="450" y="147" text-anchor="middle" class="lbl">OUTRO</text></g>
+          <text class="more" data-f="1" x="300" y="258" text-anchor="middle" style="transition-delay:1.1s">paz</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 14 problema -->
+    <section class="slide" data-mood="storm">
+      <div class="inner split">
+        <div class="col cold">
+          <p class="eyebrow">Doutrina · o problema</p>
+          <h2>Nosso pecado nos coloca <em>contra</em> Deus.</h2>
+          <ul class="points">
+            <li class="f" data-f="1">A separação veio da nossa rebelião, não de Deus.</li>
+            <li class="f" data-f="2">Tentamos consertar com esforço, boas obras e religião.</li>
+            <li class="f" data-f="3">Somos impotentes para fazer as pazes.</li>
+          </ul>
+        </div>
+        <svg class="scene" viewBox="0 0 800 340" role="img" aria-label="Um abismo entre Deus e nós; nossas tentativas não alcançam o outro lado">
+          <polygon class="cliff" points="0,130 300,130 278,340 0,340"/>
+          <polygon class="cliff" points="500,130 800,130 800,340 522,340"/>
+          <text x="150" y="105" text-anchor="middle" class="lbl">DEUS</text>
+          <text x="650" y="105" text-anchor="middle" class="lbl">NÓS</text>
+          <text x="400" y="290" text-anchor="middle" class="sinword f" data-f="1">pecado</text>
+          <rect class="try s" data-f="2" x="430" y="122" width="70" height="8" rx="3"/>
+          <rect class="try s" data-f="2" x="390" y="150" width="112" height="8" rx="3" style="animation-delay:.5s"/>
+          <rect class="try s" data-f="2" x="415" y="180" width="92" height="8" rx="3" style="animation-delay:1s"/>
+          <text class="sm trylbl" data-f="2" x="560" y="158">esforço</text>
+          <text class="sm trylbl" data-f="2" x="560" y="186" style="transition-delay:.8s">boas obras</text>
+          <text class="sm trylbl" data-f="2" x="560" y="214" style="transition-delay:1.3s">religião</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 15 ponte -->
+    <section class="slide" data-mood="dawn">
+      <div class="inner split">
+        <div class="col">
+          <p class="eyebrow">Doutrina · a iniciativa</p>
+          <h2>Deus veio até nós quando <em>não podíamos</em> ir até Ele.</h2>
+          <ul class="points">
+            <li class="f" data-f="1">Ele veio primeiro. Nós é que somos reconciliados com Deus.</li>
+            <li class="f" data-f="2">Ele nos amou antes de O amarmos.</li>
+            <li class="f" data-f="3">Ele fez tudo: a reconciliação é obra de Deus em Cristo (2Co 5:19).</li>
+          </ul>
+        </div>
+        <svg class="scene" viewBox="0 0 800 340" role="img" aria-label="A cruz forma uma ponte sobre o abismo e alguém atravessa até Deus">
+          <circle class="glow" data-f="3" cx="150" cy="130" r="150"/>
+          <polygon class="cliff" points="0,130 300,130 278,340 0,340"/>
+          <polygon class="cliff" points="500,130 800,130 800,340 522,340"/>
+          <text x="150" y="250" text-anchor="middle" class="lbl">DEUS</text>
+          <text x="650" y="250" text-anchor="middle" class="lbl">NÓS</text>
+          <rect class="post s" data-f="1" x="393" y="52" width="14" height="190" rx="3"/>
+          <rect class="beam s" data-f="1" x="292" y="122" width="216" height="14" rx="3"/>
+          <circle class="love s" data-f="2" cx="190" cy="104" r="9"/>
+          <g class="walker s" data-f="3"><circle cx="650" cy="84" r="11"/><rect x="643" y="97" width="14" height="26" rx="6"/></g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 16 três palavras -->
+    <section class="slide" data-mood="dawn">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Três grandes palavras</p>
+          <h2>Uma só obra, <em>toda de Deus</em></h2>
+          <div class="cards">
+            <div class="card f" data-f="1"><span class="v">VOLTADA A CRISTO</span><strong>Propiciação</strong><span>A ira de Deus foi satisfeita.</span></div>
+            <div class="card f" data-f="2"><span class="v">VOLTADA A DEUS</span><strong>Justificação</strong><span>Deus declara: aceito.</span></div>
+            <div class="card f" data-f="3"><span class="v">VOLTADA A NÓS</span><strong>Reconciliação</strong><span>A volta para a família de Deus.</span></div>
+          </div>
+          <p class="note f" data-f="4">Nenhuma das três é causada pelo homem.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 muito mais -->
+    <section class="slide" data-mood="dawn">
+      <div class="inner split">
+        <div class="col">
+          <p class="eyebrow">Romanos 5:9-10 · do menor para o maior</p>
+          <h2>Se Ele morreu por inimigos, <em>muito mais</em> guardará os reconciliados.</h2>
+          <ul class="points">
+            <li class="f" data-f="1">Já: justificados pelo seu sangue (v. 9).</li>
+            <li class="f" data-f="2">Muito mais: seremos salvos da ira que o nosso pecado merece (v. 9).</li>
+            <li class="f" data-f="3">“Por sua vida”: o Cristo ressurreto vive e intercede por nós (Hb 7:25).</li>
+          </ul>
+        </div>
+        <svg class="scene" viewBox="0 0 600 360" role="img" aria-label="A cruz abriga a pessoa da chuva da ira">
+          <g class="rain" id="rain"></g>
+          <ellipse class="cloud" cx="170" cy="46" rx="130" ry="40"/><ellipse class="cloud" cx="330" cy="36" rx="150" ry="46"/><ellipse class="cloud" cx="470" cy="50" rx="110" ry="36"/>
+          <text x="300" y="52" text-anchor="middle" class="lbl">IRA</text>
+          <path class="dome s" data-f="2" d="M150 330 A150 150 0 0 1 450 330 Z"/>
+          <rect class="xbar" data-f="1" x="293" y="130" width="14" height="200" rx="3"/>
+          <rect class="xbar" data-f="1" x="240" y="180" width="120" height="14" rx="3"/>
+          <g><circle cx="370" cy="286" r="11" fill="#f4eddf"/><rect x="363" y="299" width="14" height="30" rx="6" fill="#f4eddf"/></g>
+          <line x1="40" y1="330" x2="560" y2="330" stroke="rgba(244,237,223,.3)" stroke-width="2"/>
+          <text class="more" data-f="3" x="300" y="356" text-anchor="middle">muito mais</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- por causa da reconciliação -->
+    <section class="slide" data-mood="dawn">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">O propósito maior · Romanos 5:9-11</p>
+          <h2>Por causa da reconciliação, Deus <em>trabalha</em> na tribulação.</h2>
+          <div class="cards">
+            <div class="card f" data-f="1"><span class="v">V. 9</span><strong>Não é castigo</strong><span>A ira já foi resolvida na cruz. A prensa não é punição.</span></div>
+            <div class="card f" data-f="2"><span class="v">V. 10</span><strong>É do Pai</strong><span>Quem era inimigo agora é filho. Quem prensa é quem ama.</span></div>
+            <div class="card f" data-f="3"><span class="v">V. 4</span><strong>Tem propósito</strong><span>O puro aparece: caráter aprovado e esperança.</span></div>
+            <div class="card f" data-f="4"><span class="v">V. 11</span><strong>Termina em Deus</strong><span>O fim de tudo: nos gloriamos em Deus, reconciliados.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 princípio 2 -->
+    <section class="slide" data-mood="dawn">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Princípio</p>
+          <p class="principle">Quem amou você como inimigo não vai soltar você como <em>filho</em>.</p>
+          <p class="note f" data-f="1">A certeza da salvação está na obra de Cristo, não no nosso desempenho.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 20 aplicações 2 -->
+    <section class="slide apply" data-mood="dawn">
+      <div class="inner">
+        <div class="col">
+          <p class="eyebrow">Aplicações · para o coração</p>
+          <h2>Amado no pior dia. Enviado para <em>fazer as pazes</em>.</h2>
+          <div class="qs">
+            <div class="q f" data-f="1"><small>1</small><p>Deus amou você no seu <b>pior dia</b>. Onde você ainda tenta merecer um amor que já foi derramado?</p></div>
+            <div class="q f" data-f="2"><small>2</small><p>Quem foi reconciliado se torna reconciliador. <b>Com quem</b> você precisa fazer as pazes esta semana? Pense em um nome.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- fechamento -->
+    <section class="slide" data-mood="dawn">
+      <div class="sun"></div>
+      <div class="inner center">
+        <div class="col">
+          <p class="eyebrow">De volta à prensa</p>
+          <p class="lead" style="max-width:38ch">O trigo não entende a prensa. Mas você conhece quem a segura.</p>
+          <p class="verse f" data-f="1" style="max-width:26ch">Quem permite a prensa <b>entregou o Filho por você</b>.</p>
+          <p class="ref f" data-f="2">“...mediante quem recebemos agora a reconciliação.” Romanos 5:11</p>
+          <p class="lead f" data-f="3" style="max-width:40ch">Em que área você vai confiar, esta semana, que o Pai está produzindo algo puro em você?</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bar" aria-label="Navegação da apresentação">
+    <button id="prev" type="button" aria-label="Voltar">← Voltar</button>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <span class="count" id="count">1 / 22</span>
+    <button id="full" type="button">Tela cheia</button>
+    <button id="next" type="button" aria-label="Avançar">Avançar →</button>
+  </nav>
+</div>
+
+<script>
+(function(){
+  var deck=document.getElementById('deck'), stage=document.getElementById('stage');
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var fill=document.getElementById('fill'), count=document.getElementById('count');
+  var prevB=document.getElementById('prev'), nextB=document.getElementById('next'), fullB=document.getElementById('full');
+  var i=0, step=0, lastStep=0, lastI=0;
+
+  // chuva
+  var rain=document.getElementById('rain'), NS='http://www.w3.org/2000/svg';
+  for(var x=60;rain&&x<=540;x+=30){
+    var l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',x+12);l.setAttribute('y1',70);l.setAttribute('x2',x);l.setAttribute('y2',328);
+    l.style.animationDelay=(-(x%7)/7)+'s';
+    rain.appendChild(l);
+  }
+
+  function maxStep(s){
+    var m=0;[].forEach.call(s.querySelectorAll('[data-f]'),function(e){m=Math.max(m,+e.dataset.f)});return m;
+  }
+  function render(){
+    slides.forEach(function(s,k){
+      s.classList.toggle('active',k===i);
+      s.classList.toggle('past',k<i);
+      [].forEach.call(s.querySelectorAll('[data-f]'),function(e){
+        e.classList.toggle('on',k===i && step>=+e.dataset.f);
+      });
+    });
+    [].forEach.call(slides[i].querySelectorAll('[data-only]'),function(e){e.classList.toggle('on',step===+e.dataset.only)});
+    [].forEach.call(slides[i].querySelectorAll('.f[data-f]'),function(e){
+      if(+e.dataset.f===step&&step>lastStep&&i===lastI&&window.fxBurst){var r=e.getBoundingClientRect();window.fxBurst(r.left+Math.min(r.width,260)/2,r.top+r.height/2);}
+    });
+    if(i!==lastI&&window.fxKick) window.fxKick(i>lastI?-1:1);
+    lastStep=step;lastI=i;
+    deck.dataset.mood=slides[i].dataset.mood||'night';
+    var total=slides.reduce(function(a,s){return a+1+maxStep(s)},0);
+    var done=slides.slice(0,i).reduce(function(a,s){return a+1+maxStep(s)},0)+1+step;
+    fill.style.width=(done/total*100)+'%';
+    count.textContent=(i+1)+' / '+slides.length;
+    prevB.disabled=(i===0&&step===0);
+    nextB.disabled=(i===slides.length-1&&step===maxStep(slides[i]));
+  }
+  function next(){
+    if(step<maxStep(slides[i])) step++;
+    else if(i<slides.length-1){i++;step=0;}
+    render();
+  }
+  function prev(){
+    if(step>0) step--;
+    else if(i>0){i--;step=maxStep(slides[i]);}
+    render();
+  }
+  nextB.addEventListener('click',next);
+  prevB.addEventListener('click',prev);
+  stage.addEventListener('click',function(e){ if(!e.target.closest('a,button')) next(); });
+  document.addEventListener('keydown',function(e){
+    if(['ArrowRight','PageDown',' ','Enter'].indexOf(e.key)>-1){ if(e.target.tagName==='BUTTON'&&(e.key===' '||e.key==='Enter')) return; e.preventDefault();next(); }
+    else if(['ArrowLeft','PageUp','Backspace'].indexOf(e.key)>-1){e.preventDefault();prev();}
+    else if(e.key==='Home'){i=0;step=0;render();}
+    else if(e.key==='End'){i=slides.length-1;step=0;render();}
+  });
+  var tx=null;
+  stage.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+  stage.addEventListener('touchend',function(e){
+    if(tx===null) return; var dx=e.changedTouches[0].clientX-tx; tx=null;
+    if(dx>50){ prev(); e.preventDefault(); } else if(dx<-50){ next(); e.preventDefault(); }
+  });
+  fullB.addEventListener('click',function(){
+    try{
+      if(document.fullscreenElement){ document.exitFullscreen(); }
+      else { var p=document.documentElement.requestFullscreen(); if(p&&p.catch) p.catch(function(){ fullB.textContent='Tela cheia indisponível'; }); }
+    }catch(err){ fullB.textContent='Tela cheia indisponível'; }
+  });
+  render();
+})();
+</script>
+<script>
+(function(){
+  var c=document.getElementById('fx'); if(!c||!c.getContext) return;
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var g=c.getContext('2d'),W,H,P=[],B=[],kick=0;
+  function size(){W=c.width=c.clientWidth;H=c.height=c.clientHeight}
+  size();addEventListener('resize',size);
+  for(var k=0;k<70;k++)P.push({x:Math.random(),y:Math.random(),r:.6+Math.random()*2.2,v:.0004+Math.random()*.0012,a:.12+Math.random()*.4,p:Math.random()*6.28});
+  window.fxBurst=function(x,y){var r=c.getBoundingClientRect();for(var k=0;k<22;k++){var a=Math.random()*6.28,s=1+Math.random()*4;B.push({x:x-r.left,y:y-r.top,vx:Math.cos(a)*s,vy:Math.sin(a)*s-1,l:1,r:1+Math.random()*2.5})}};
+  window.fxKick=function(d){kick=d*26};
+  (function loop(t){
+    g.clearRect(0,0,W,H);kick*=.92;
+    for(var k=0;k<P.length;k++){var p=P[k];p.y-=p.v;p.x+=Math.sin(t/1800+p.p)*.00025+kick/W*.4*p.r/2;
+      if(p.y<-.02){p.y=1.02;p.x=Math.random()} if(p.x<-.02)p.x=1.02; if(p.x>1.02)p.x=-.02;
+      g.globalAlpha=p.a*(.6+.4*Math.sin(t/900+p.p));g.fillStyle='#e9b750';g.beginPath();g.arc(p.x*W,p.y*H,p.r,0,6.28);g.fill();}
+    for(var j=B.length-1;j>=0;j--){var b=B[j];b.x+=b.vx;b.y+=b.vy;b.vy+=.08;b.l-=.022;if(b.l<=0){B.splice(j,1);continue}
+      g.globalAlpha=b.l;g.fillStyle='#ffe9b0';g.beginPath();g.arc(b.x,b.y,b.r,0,6.28);g.fill();}
+    g.globalAlpha=1;requestAnimationFrame(loop);
+  })(0);
+})();
+</script>
+</body>
+</html>
